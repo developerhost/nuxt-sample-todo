@@ -1,18 +1,21 @@
 <template>
   <section class="container">
     <h1>TODO</h1>
-    <p><input v-model="content" type="text" name="content"></p>
+    <p><input v-model="content" type="text" name="content" @focus="set_flg"></p>
     <div>
       <button @click="insert">
         save
       </button>
-      <button>find</button>
+
+      <button @click="find">
+        find
+      </button>
     </div>
     <ul>
-      <li v-for="(todo, index) in todos" :key="index">
+      <li v-for="(todo, index) in display_todos" :key="index">
         <span>{{ todo.content }}</span>
         <span>{{ todo.created }}</span>
-        <span>×</span>
+        <span @click="remove(todo)">×</span>
       </li>
     </ul>
   </section>
@@ -24,17 +27,50 @@ export default {
   // eslint-disable-next-line object-shorthand
   data: function () {
     return {
-      content: ''
+      content: '',
+      fing_flg: false
     }
   },
   computed: {
-    ...mapState(['todos'])
+    ...mapState(['todos']),
+    // eslint-disable-next-line object-shorthand
+    // eslint-disable-next-line vue/return-in-computed-property
+    display_todos () {
+      if (this.fing_flg) {
+        const arr = []
+        const data = this.todos
+        data.forEach((element) => {
+          // eslint-disable-next-line eqeqeq
+          if (element.content.toLowerCase() == this.content.toLowerCase()) {
+            arr.push(element)
+          }
+        })
+        return arr
+      } else {
+        return this.todos
+      }
+    }
   },
   methods: {
     // eslint-disable-next-line object-shorthand
     insert: function () {
       this.$store.commit('insert', { content: this.content })
       this.content = ''
+    },
+    // eslint-disable-next-line object-shorthand
+    find: function () {
+      this.fing_flg = true
+    },
+    // eslint-disable-next-line object-shorthand
+    set_flg: function () {
+      if (this.find_flg) {
+        this.find_flg = false
+        this.content = ''
+      }
+    },
+    // eslint-disable-next-line object-shorthand
+    remove: function (todo) {
+      this.$store.commit('remove', todo)
     }
   }
 }
